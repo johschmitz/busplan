@@ -120,7 +120,7 @@ app.controller('updateDisplay', function($scope,$http,dataService) {
     }, 1000); //update every second
     setInterval(function() {
         json_obj = requestBusData($scope,$http,dataService);
-    }, 10000); //update every minute
+    }, 60000); //update every minute
 });
 
 function currentTime($scope)
