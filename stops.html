@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
+
+<link rel="icon" href="bus_icon.png" sizes="192x192" type="image/ico">
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=520" />
+
+<style>
+body {
+    font-family: sans-serif;
+}
+table {
+    border-collapse: collapse;
+}
+td {
+    padding: 10px 20px 10px 20px;
+}
+tr {
+    border: solid;
+    border-width: 1px 0;
+}
+tr:first-child {
+    border-top: none;
+}
+tr:last-child {
+    border-bottom: none;
+}
+table tr:nth-child(odd) {
+    background-color: #dddddd;
+}
+table tr:nth-child(even) {
+    background-color: #ffffff;
+}
+table tr.title_row {
+    background-color: #aaaaaa;
+}
+</style>
+
+<title>Stops</title>
+
+</head>
+
+<body>
+
+<center>
+    <div ng-app="busstops" ng-controller="stopsController">
+        <h1>Bus Stops in Aachen</h1>
+        <table>
+            <tr class="title_row">
+                <td>Name</td>
+                <td>ID</td>
+            </tr>
+            <tr ng-repeat="stop in stops">
+                <td>{{ stop[1] }}</td>
+                <td>{{ stop[2] }}</td>
+            </tr>
+        </table>
+    </div>
+</center>
+
+<script>
+var app = angular.module('busstops', []);
+
+app.controller('stopsController', function($scope,$http) {
+    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?ReturnList=StopPointName,StopID", { //All Stops
+        transformResponse: function(data, headers) {
+            str = '['+data.split('\n').slice(1).join(',')+']'; // repair json
+//            json_obj = JSON.parse(str).sort(function(a,b){return a[1] - b[1]}); // sort by name
+            json_obj = JSON.parse(str).sort(); // sort by name
+            return json_obj;
+        }
+        }).success(function(json_obj) {$scope.stops = json_obj;});
+});
+</script>
+
+</body>
+</html>
