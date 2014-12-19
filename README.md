@@ -1,4 +1,4 @@
 busplan
 =======
 
-Display realtime bus departure times in Aachen in the browser
+Display realtime bus departure times for Aachen in the browser
