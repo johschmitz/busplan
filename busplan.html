@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
+<meta charset="utf-8">
+
+<style>
+body {
+    font-family: sans-serif;
+}
+table {
+  border-collapse: collapse;
+}
+td {
+  padding: 10px 20px 10px 20px;
+}
+tr {
+  border: solid;
+  border-width: 1px 0;
+}
+tr:first-child {
+  border-top: none;
+}
+tr:last-child {
+  border-bottom: none;
+}
+table tr:nth-child(odd) {
+  background-color: #dddddd;
+}
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+table tr.title_row {
+  background-color: #aaaaaa;
+}
+</style>
+
+</head>
+
+<body ng-app="busplan">
+
+<center>
+
+<div ng-controller="updateDisplay">
+    <h1>Campus Melaten | {{time_now | date : 'HH:mm:ss'}}</h1>
+    <table>
+        <tr class="title_row">
+            <td>Line</td>
+            <td>Destination</td>
+            <td>Departure</td>
+            <td>Remaining</td>
+        </tr>
+        <tr ng-repeat="bus in busses">
+            <td>{{ bus[1] }}</td>
+            <td>{{ bus[2] }}</td>
+            <td>{{ bus[3] | date : 'HH:mm:ss' }}</td>
+            <td>{{ bus[4] }} min</td>
+        </tr>
+    </table>
+</div>
+
+</center>
+<script>
+var app = angular.module('busplan', []);
+
+
+app.factory('dataService', function() {
+    var busses = [];
+
+    return {
+        getData: function () {
+            return busses;
+        },
+        setData: function (json_obj) {
+            busses = json_obj;
+        }
+    };
+});
+
+function requestBusData($scope,$http,dataService) {
+    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?StopAlso=false&ReturnList=linename,destinationtext,estimatedtime&StopId=100629", { //Campus Melaten
+        transformResponse: function(data, headers) {
+            str = '['+data.split('\n').slice(1).join(',')+']'; // repair json
+            json_obj = JSON.parse(str).sort(function(a,b){return a[3] - b[3]}); // sort by departure time
+            for (i = 0; i < json_obj.length; i++) { // add field for remaining time
+                json_obj[i].push('');
+            }
+            return json_obj;
+        }
+        }).success(function(json_obj) {dataService.setData(json_obj);});
+}
+
+function updateRemaining($scope,dataService) {
+    json_obj = dataService.getData();
+    cut_off = 0;
+    for (i = 0; i < json_obj.length; i++) { // calculate remaining time
+        departure = new Date(json_obj[i][3]).getTime(); // in microseconds
+        now = new Date().getTime(); // in microseconds
+        remaining = Math.round((departure - now)/1000/60); // in minutes
+        json_obj[i][4] = remaining;
+        if (remaining < -3) {
+            cut_off++;
+        }
+    }
+    json_obj = json_obj.slice(cut_off); // cut off old busses
+    $scope.busses = json_obj; // give to view
+    dataService.setData(json_obj); // persistent storage of data
+}
+
+app.controller('updateDisplay', function($scope,$http,dataService) {
+    requestBusData($scope,$http,dataService);
+    currentTime($scope);
+    updateRemaining($scope,dataService);
+    setInterval(function() {
+        $scope.$apply(function () {
+            currentTime($scope);
+            updateRemaining($scope,dataService);
+        })
+    }, 1000); //update every second
+    setInterval(function() {
+        json_obj = requestBusData($scope,$http,dataService);
+    }, 10000); //update every minute
+});
+
+function currentTime($scope)
+{
+    date_now = new Date();
+    $scope.time_now = date_now.getTime();
+}
+</script>
+
+</body>
+</html>
