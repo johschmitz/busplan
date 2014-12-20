@@ -116,7 +116,12 @@ function updateRemaining($scope,dataService) {
 }
 
 app.controller('updateDisplay', function($location,$scope,$http,dataService) {
-    var StopId = 100629; // default stop
+    if (location.search) {
+        var StopId = location.search.split('StopId=')[1]
+    }
+    else {
+        var StopId = 100629; // default stop
+    }
     requestBusData($scope,$http,dataService,StopId);
     currentTime($scope);
     updateRemaining($scope,dataService);
