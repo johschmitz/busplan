@@ -65,13 +65,12 @@ table tr.title_row {
         </tr>
     </table>
     <br>
-    <a href="stops.html">Busstops in Aachen</a> 
+    <a href="stops.html">Busstops in Aachen</a>
 </div>
 
 </center>
 <script>
 var app = angular.module('busplan', []);
-
 
 app.factory('dataService', function() {
     var busses = [];
@@ -86,8 +85,8 @@ app.factory('dataService', function() {
     };
 });
 
-function requestBusData($scope,$http,dataService) {
-    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?StopAlso=false&ReturnList=linename,destinationtext,estimatedtime&StopId=100629", { //Campus Melaten
+function requestBusData($scope,$http,dataService,StopId) {
+    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?StopAlso=false&ReturnList=linename,destinationtext,estimatedtime&StopId="+StopId, { //Campus Melaten
         transformResponse: function(data, headers) {
             str = '['+data.split('\n').slice(1).join(',')+']'; // repair json
             json_obj = JSON.parse(str).sort(function(a,b){return a[3] - b[3]}); // sort by departure time
@@ -116,8 +115,9 @@ function updateRemaining($scope,dataService) {
     dataService.setData(json_obj); // persistent storage of data
 }
 
-app.controller('updateDisplay', function($scope,$http,dataService) {
-    requestBusData($scope,$http,dataService);
+app.controller('updateDisplay', function($location,$scope,$http,dataService) {
+    var StopId = 100629; // default stop
+    requestBusData($scope,$http,dataService,StopId);
     currentTime($scope);
     updateRemaining($scope,dataService);
     setInterval(function() {
@@ -127,7 +127,7 @@ app.controller('updateDisplay', function($scope,$http,dataService) {
         });
     }, 1000); //update every second
     setInterval(function() {
-        json_obj = requestBusData($scope,$http,dataService);
+        json_obj = requestBusData($scope,$http,dataService,StopId);
     }, 60000); //update every minute
 });
 
