@@ -49,7 +49,7 @@ table tr.title_row {
 <center>
 
 <div ng-controller="updateDisplay">
-    <h1>Campus Melaten | {{time_now | date : 'HH:mm:ss'}}</h1>
+    <h1>{{ StopPointName }} | {{time_now | date : 'HH:mm:ss'}}</h1>
     <table>
         <tr class="title_row">
             <td>Line</td>
@@ -86,7 +86,7 @@ app.factory('dataService', function() {
 });
 
 function requestBusData($scope,$http,dataService,StopId) {
-    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?StopAlso=false&ReturnList=linename,destinationtext,estimatedtime&StopId="+StopId, { //Campus Melaten
+    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?StopAlso=false&ReturnList=linename,destinationtext,estimatedtime&StopId="+StopId, {
         transformResponse: function(data, headers) {
             str = '['+data.split('\n').slice(1).join(',')+']'; // repair json
             json_obj = JSON.parse(str).sort(function(a,b){return a[3] - b[3]}); // sort by departure time
@@ -97,6 +97,18 @@ function requestBusData($scope,$http,dataService,StopId) {
         }
         }).success(function(json_obj) {dataService.setData(json_obj);});
 }
+
+function requestStopName($scope,$http,StopId) {
+    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?StopAlso=true&StopId="+StopId, {
+        transformResponse: function(data, headers) {
+            str = '['+data.split('\n').slice(1, 2).join(',')+']'; // repair json
+            json_obj = JSON.parse(str); // sort by departure time
+            return json_obj;
+        }
+        }).success(function(json_obj) {$scope.StopPointName = json_obj[0][1];});
+}
+
+
 
 function updateRemaining($scope,dataService) {
     json_obj = dataService.getData();
@@ -118,10 +130,12 @@ function updateRemaining($scope,dataService) {
 app.controller('updateDisplay', function($location,$scope,$http,dataService) {
     if (location.search) {
         var StopId = location.search.split('StopId=')[1]
+        var StopPointName = location.search.split('StopId=')[1]
     }
     else {
         var StopId = 100629; // default stop
     }
+    requestStopName($scope,$http,StopId);
     requestBusData($scope,$http,dataService,StopId);
     currentTime($scope);
     updateRemaining($scope,dataService);

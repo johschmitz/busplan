@@ -38,6 +38,9 @@ table tr:nth-child(even) {
 table tr.title_row {
     background-color: #aaaaaa;
 }
+table tr.clicked {
+    background-color: #aa0000;
+}
 </style>
 
 <title>Stops</title>
@@ -54,7 +57,7 @@ table tr.title_row {
                 <td>Name</td>
                 <td>ID</td>
             </tr>
-            <tr ng-repeat="stop in stops">
+            <tr ng-repeat="stop in stops" ng-click="showStop(stop[2])">
                 <td>{{ stop[1] }}</td>
                 <td>{{ stop[2] }}</td>
             </tr>
@@ -65,16 +68,21 @@ table tr.title_row {
 <script>
 var app = angular.module('busstops', []);
 
-app.controller('stopsController', function($scope,$http) {
-    $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?ReturnList=StopPointName,StopID", { //All Stops
-        transformResponse: function(data, headers) {
-            str = '['+data.split('\n').slice(1).join(',')+']'; // repair json
-//            json_obj = JSON.parse(str).sort(function(a,b){return a[1] - b[1]}); // sort by name
-            json_obj = JSON.parse(str).sort(); // sort by name
-            return json_obj;
-        }
-        }).success(function(json_obj) {$scope.stops = json_obj;});
+app.controller('stopsController',
+    function($scope,$http) {
+        $scope.showStop = function(StopId) {
+            window.open("index.html?StopId="+StopId,"_self");
+        };
+
+        $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?ReturnList=StopPointName,StopID", { //All Stops
+            transformResponse: function(data, headers) {
+                str = '['+data.split('\n').slice(1).join(',')+']'; // repair json
+                json_obj = JSON.parse(str).sort(); // sort by name
+                return json_obj;
+            }
+            }).success(function(json_obj) {$scope.stops = json_obj;});
 });
+
 </script>
 
 </body>
