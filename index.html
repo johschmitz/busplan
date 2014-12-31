@@ -132,7 +132,7 @@ app.controller('updateDisplay', function($location,$scope,$http,dataService) {
         var StopPointName = location.search.split('StopId=')[1]
     }
     else {
-        var StopId = 100629; // default stop
+        var StopId = 100000; // default stop
     }
     requestStopName($scope,$http,StopId);
     requestBusData($scope,$http,dataService,StopId);
