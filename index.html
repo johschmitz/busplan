@@ -49,7 +49,7 @@ table tr.title_row {
 <center>
 
 <div ng-controller="updateDisplay">
-    <h1>{{ StopPointName }} | {{time_now | date : 'HH:mm:ss'}}</h1>
+    <h1><a href="stops.html">{{ StopPointName }}</a> | {{time_now | date : 'HH:mm:ss'}}</h1>
     <table>
         <tr class="title_row">
             <td>Line</td>
@@ -65,7 +65,6 @@ table tr.title_row {
         </tr>
     </table>
     <br>
-    <a href="stops.html">Busstops in Aachen</a>
 </div>
 
 </center>
