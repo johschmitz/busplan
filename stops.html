@@ -38,8 +38,8 @@ table tr:nth-child(even) {
 table tr.title_row {
     background-color: #aaaaaa;
 }
-table tr.clicked {
-    background-color: #aa0000;
+table tr.red {
+    background-color: #cc0000;
 }
 </style>
 
@@ -57,7 +57,7 @@ table tr.clicked {
                 <td>Name</td>
                 <td>ID</td>
             </tr>
-            <tr ng-repeat="stop in stops" ng-click="showStop(stop[2])">
+            <tr ng-repeat="stop in stops" ng-class="{'red' : clickedIndex == $index}" ng-click="showStop($index,stop[2])">
                 <td>{{ stop[1] }}</td>
                 <td>{{ stop[2] }}</td>
             </tr>
@@ -70,8 +70,15 @@ var app = angular.module('busstops', []);
 
 app.controller('stopsController',
     function($scope,$http) {
-        $scope.showStop = function(StopId) {
-            window.open("index.html?StopId="+StopId,"_self");
+        $scope.showStop = function(index, StopId) {
+            // color and uncolor the selected item
+            $scope.clickedIndex = index;
+            setTimeout(function () {
+                $scope.$apply(function(){
+                    $scope.clickedIndex = -1; });
+                }, 300);
+            // load Busstop
+            setTimeout(function(){ window.open("index.html?StopId="+StopId,"_self"); }, 300);
         };
 
         $http.get("http://ivu.aseag.de/interfaces/ura/instant_V1?ReturnList=StopPointName,StopID", { //All Stops
