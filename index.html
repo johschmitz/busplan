@@ -117,7 +117,7 @@ function updateRemaining($scope,dataService) {
         now = new Date().getTime(); // in microseconds
         remaining = Math.round((departure - now)/1000/60); // in minutes
         json_obj[i][4] = remaining;
-        if (remaining < -3) {
+        if (remaining < -2) {
             cut_off++;
         }
     }
