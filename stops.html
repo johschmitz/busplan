@@ -13,8 +13,14 @@
 body {
     font-family: sans-serif;
 }
+input {
+    width: 300px;
+    height: 30px;
+    font-size: 18px;
+}
 table {
     border-collapse: collapse;
+    min-width: 310px
 }
 td {
     padding: 10px 20px 10px 20px;
@@ -52,12 +58,13 @@ table tr.red {
 <center>
     <div ng-app="busstops" ng-controller="stopsController">
         <h1>Bus Stops in Aachen</h1>
+        <p><input placeholder="Filter" type="text" ng-model="stopfilter"></p>
         <table>
             <tr class="title_row">
                 <td>Name</td>
                 <td>ID</td>
             </tr>
-            <tr ng-repeat="stop in stops" ng-class="{'red' : clickedIndex == $index}" ng-click="showStop($index,stop[2])">
+            <tr ng-repeat="stop in stops | filter:stopfilter" ng-class="{'red' : clickedIndex == $index}" ng-click="showStop($index,stop[2])">
                 <td>{{ stop[1] }}</td>
                 <td>{{ stop[2] }}</td>
             </tr>
