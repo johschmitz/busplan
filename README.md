@@ -5,4 +5,4 @@ Realtime display of bus departure times for Aachen in the browser using the IVU 
 
 Echtzeitanzeige der Abfahrtszeiten von Bussen in Aachen im Browser basierend auf der IVU API der ASEAG.
 
-http://johschmitz.github.io/busplan/
+https://johschmitz.github.io/busplan/
